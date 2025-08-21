@@ -71,6 +71,7 @@ function Login() {
         localStorage.setItem('token', token)
         if (payload.role) localStorage.setItem('role', payload.role)
         if (payload.name) localStorage.setItem('name', payload.name)
+        window.dispatchEvent(new Event('auth'))
         navigate('/search')
       } else {
         setMessage(res.data?.message || 'Login failed')
@@ -99,11 +100,11 @@ function Navbar() {
   const role = localStorage.getItem('role')
   const navigate = useNavigate()
   useEffect(() => {
-    const onStorage = () => setName(localStorage.getItem('name'))
-    window.addEventListener('storage', onStorage)
-    return () => window.removeEventListener('storage', onStorage)
+    const onAuth = () => setName(localStorage.getItem('name'))
+    window.addEventListener('auth', onAuth as EventListener)
+    return () => window.removeEventListener('auth', onAuth as EventListener)
   }, [])
-  const logout = () => { localStorage.clear(); navigate('/login') }
+  const logout = () => { localStorage.clear(); window.dispatchEvent(new Event('auth')); navigate('/login') }
   return (
     <nav className="navbar">
       <Link to="/search">Search</Link>
