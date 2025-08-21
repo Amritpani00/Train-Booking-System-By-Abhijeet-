@@ -49,7 +49,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<String>> login(@Valid @RequestBody LoginRequest req) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
-        String token = jwtService.generateToken(req.getEmail(), Map.of());
+        var user = userRepository.findByEmail(req.getEmail()).orElseThrow();
+        String token = jwtService.generateToken(req.getEmail(), Map.of("role", user.getRole().name(), "name", user.getFullName()));
         return ResponseEntity.ok(ApiResponse.<String>builder().success(true).message("Logged in").data(token).build());
     }
 
