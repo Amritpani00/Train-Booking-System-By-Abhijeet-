@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -27,6 +28,17 @@ public class AdminController {
     private final StationRepository stationRepository;
     private final RouteRepository routeRepository;
 
+    @GetMapping("/stations")
+    public ResponseEntity<ApiResponse<List<Station>>> listStations() {
+        return ResponseEntity.ok(ApiResponse.<List<Station>>builder().success(true).data(stationRepository.findAll()).build());
+    }
+
+    @DeleteMapping("/stations/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteStation(@PathVariable Long id) {
+        stationRepository.deleteById(id);
+        return ResponseEntity.ok(ApiResponse.<Void>builder().success(true).message("Deleted").build());
+    }
+
     @PostMapping("/stations")
     public ResponseEntity<ApiResponse<Station>> addStation(@Valid @RequestBody StationRequest req) {
         Station s = Station.builder().code(req.getCode()).name(req.getName()).build();
@@ -37,6 +49,17 @@ public class AdminController {
     public ResponseEntity<ApiResponse<Train>> addTrain(@Valid @RequestBody TrainRequest req) {
         Train t = Train.builder().code(req.getCode()).name(req.getName()).totalSeats(req.getTotalSeats()).build();
         return ResponseEntity.ok(ApiResponse.<Train>builder().success(true).data(trainRepository.save(t)).build());
+    }
+
+    @GetMapping("/routes")
+    public ResponseEntity<ApiResponse<List<Route>>> listRoutes() {
+        return ResponseEntity.ok(ApiResponse.<List<Route>>builder().success(true).data(routeRepository.findAll()).build());
+    }
+
+    @DeleteMapping("/routes/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteRoute(@PathVariable Long id) {
+        routeRepository.deleteById(id);
+        return ResponseEntity.ok(ApiResponse.<Void>builder().success(true).message("Deleted").build());
     }
 
     @PostMapping("/routes")
